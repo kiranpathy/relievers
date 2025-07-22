@@ -54,4 +54,4 @@ relievers_new$predicted_ERA <- predict(model, newdata = relievers_new)
 
 relievers_new_update <- relievers_new %>%
   mutate(era_diff = predicted_ERA - ERA) %>%
-  filter(era_diff <= 0 & WHIP <= 1.20)
+  filter(era_diff <= 0 & WHIP <= 1.20 & `GB/FB` >= 1)
