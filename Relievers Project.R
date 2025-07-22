@@ -44,6 +44,11 @@ model <- lm(ERA ~ `K%` + `Zone%` + `GB/FB` + `HardHit%`,
             data = starters)
 summary(model)
 
+starters$predicted_ERA <- predict(model, newdata = starters)
+
+starters_new_update <- starters %>%
+  mutate(era_diff = predicted_ERA - ERA)
+
 #changes for relievers_new
 relievers_new$`K%` <- as.numeric(sub("%", "", relievers_new$`K%`)) / 100
 relievers_new$`BB%` <- as.numeric(sub("%", "", relievers_new$`BB%`)) / 100
