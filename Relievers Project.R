@@ -26,6 +26,7 @@ library(gt)
 library(tinytex)
 
 relievers <- read_csv("relievers_7_21.csv")
+starters <- read_csv("starters_7_21.csv")
 
 #change percentage columns into decimals
 relievers$`GB%` <- as.numeric(sub("%", "", relievers$`GB%`)) / 100
@@ -36,3 +37,13 @@ relievers$`HardHit%` <- as.numeric(sub("%", "", relievers$`HardHit%`)) / 100
 new_relievers <- relievers %>%
   filter(`GB%` >= .50 & `BB/9` < 3) %>%
   arrange(`HardHit%`)
+
+#Getting correlations for starters
+starters$`K%` <- as.numeric(sub("%", "", starters$`K%`)) / 100
+starters$`BB%` <- as.numeric(sub("%", "", starters$`BB%`)) / 100
+starters$`HardHit%` <- as.numeric(sub("%", "", starters$`HardHit%`)) / 100
+starters$`Zone%` <- as.numeric(sub("%", "", starters$`Zone%`)) / 100
+
+model <- lm(ERA ~ `K%` + `Zone%` + `GB/FB` + `HardHit%`,
+            data = starters)
+summary(model)
