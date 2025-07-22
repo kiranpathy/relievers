@@ -27,16 +27,12 @@ library(tinytex)
 
 relievers <- read_csv("relievers_7_21.csv")
 starters <- read_csv("starters_7_21.csv")
+relievers_new <- read_csv("relievers_new_7_21.csv")
 
 #change percentage columns into decimals
 relievers$`GB%` <- as.numeric(sub("%", "", relievers$`GB%`)) / 100
 relievers$`FB%` <- as.numeric(sub("%", "", relievers$`FB%`)) / 100
 relievers$`HardHit%` <- as.numeric(sub("%", "", relievers$`HardHit%`)) / 100
-
-#Filtering with some key metrics (general things important for a starter)
-new_relievers <- relievers %>%
-  filter(`GB%` >= .50 & `BB/9` < 3) %>%
-  arrange(`HardHit%`)
 
 #Getting correlations for starters
 starters$`K%` <- as.numeric(sub("%", "", starters$`K%`)) / 100
@@ -47,3 +43,15 @@ starters$`Zone%` <- as.numeric(sub("%", "", starters$`Zone%`)) / 100
 model <- lm(ERA ~ `K%` + `Zone%` + `GB/FB` + `HardHit%`,
             data = starters)
 summary(model)
+
+#changes for relievers_new
+relievers_new$`K%` <- as.numeric(sub("%", "", relievers_new$`K%`)) / 100
+relievers_new$`BB%` <- as.numeric(sub("%", "", relievers_new$`BB%`)) / 100
+relievers_new$`HardHit%` <- as.numeric(sub("%", "", relievers_new$`HardHit%`)) / 100
+relievers_new$`Zone%` <- as.numeric(sub("%", "", relievers_new$`Zone%`)) / 100
+
+relievers_new$predicted_ERA <- predict(model, newdata = relievers_new)
+
+relievers_new_update <- relievers_new %>%
+  mutate(era_diff = predicted_ERA - ERA) %>%
+  filter(era_diff <= 0)
