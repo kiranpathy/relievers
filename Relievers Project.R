@@ -25,37 +25,39 @@ library(knitr)
 library(gt)
 library(tinytex)
 
-relievers <- read_csv("relievers_7_21.csv")
-starters <- read_csv("starters_7_21.csv")
-relievers_new <- read_csv("relievers_new_7_21.csv")
-
-#change percentage columns into decimals
-relievers$`GB%` <- as.numeric(sub("%", "", relievers$`GB%`)) / 100
-relievers$`FB%` <- as.numeric(sub("%", "", relievers$`FB%`)) / 100
-relievers$`HardHit%` <- as.numeric(sub("%", "", relievers$`HardHit%`)) / 100
+starters <- read_csv("starters_7_22.csv")
+relievers_new <- read_csv("relievers_7_22.csv")
 
 #Getting correlations for starters
 starters$`K%` <- as.numeric(sub("%", "", starters$`K%`)) / 100
-starters$`BB%` <- as.numeric(sub("%", "", starters$`BB%`)) / 100
+starters$`O-Swing%` <- as.numeric(sub("%", "", starters$`O-Swing%`)) / 100
 starters$`HardHit%` <- as.numeric(sub("%", "", starters$`HardHit%`)) / 100
 starters$`Zone%` <- as.numeric(sub("%", "", starters$`Zone%`)) / 100
 
-model <- lm(ERA ~ `K%` + `Zone%` + `GB/FB` + `HardHit%`,
+model1 <- lm(ERA ~ `K%` + `Zone%` + `GB/FB` + `HardHit%`,
             data = starters)
-summary(model)
+summary(model1)
 
-starters$predicted_ERA <- predict(model, newdata = starters)
+model2 <- lm(ERA ~ `K%` + `Zone%` + `GB/FB` + `HardHit%` + `O-Swing%`,
+             data = starters)
+summary(model2)
+
+AIC(model1, model2)
+
+#model2 is just used for adjustments - continue with model1 
+
+starters$predicted_ERA <- predict(model1, newdata = starters)
 
 starters_new_update <- starters %>%
   mutate(era_diff = predicted_ERA - ERA)
 
 #changes for relievers_new
 relievers_new$`K%` <- as.numeric(sub("%", "", relievers_new$`K%`)) / 100
-relievers_new$`BB%` <- as.numeric(sub("%", "", relievers_new$`BB%`)) / 100
+relievers_new$`O-Swing%` <- as.numeric(sub("%", "", relievers_new$`O-Swing%`)) / 100
 relievers_new$`HardHit%` <- as.numeric(sub("%", "", relievers_new$`HardHit%`)) / 100
 relievers_new$`Zone%` <- as.numeric(sub("%", "", relievers_new$`Zone%`)) / 100
 
-relievers_new$predicted_ERA <- predict(model, newdata = relievers_new)
+relievers_new$predicted_ERA <- predict(model1, newdata = relievers_new)
 
 relievers_new_update <- relievers_new %>%
   mutate(era_diff = predicted_ERA - ERA) %>%
