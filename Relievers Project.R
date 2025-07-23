@@ -68,10 +68,25 @@ relievers$`Zone%` <- as.numeric(sub("%", "", relievers$`Zone%`)) / 100
 relievers <- relievers %>%
   mutate(`pred_ERA-` = predict(model1, newdata = relievers))
 
+##IP function
+ip_to_dec <- function(ip){
+  whole  <- floor(ip)              
+  frac10 <- round((ip - whole) * 10)  
+  (whole * 3 + frac10) / 3            
+}
+
+relievers <- relievers %>%
+  mutate(
+    Relief_IP_true = ip_to_dec(`Relief-IP`),
+    IP_per_outing  = Relief_IP_true / G
+  )
+
 relievers_new <- relievers %>%
   mutate(`diff_ERA-` = `pred_ERA-` - `ERA-`) %>%
   filter(`pred_ERA-` <= 90 & WHIP <= 1.30 & `GB/FB` >= 1) %>%
-  arrange(`pred_ERA-`)
+  arrange(desc(IP_per_outing)) %>%
+  select(!Relief_IP_true)
+##
 
 #an ERA- of 90 or lower is an above average pitcher per Fangraphs
 
