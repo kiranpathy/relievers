@@ -84,7 +84,7 @@ relievers <- relievers %>%
 relievers_new <- relievers %>%
   mutate(`diff_ERA-` = `pred_ERA-` - `ERA-`) %>%
   filter(`pred_ERA-` <= 90 & WHIP <= 1.30 & `GB/FB` >= 1) %>%
-  arrange(desc(IP_per_outing)) %>%
+  arrange(`pred_ERA-`) %>%
   select(!Relief_IP_true)
 ##
 
