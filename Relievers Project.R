@@ -1,6 +1,6 @@
 #Relievers Project
 
-#Data used is from Fangraphs, as of games prior to July 21, 2025
+#Data used is from Fangraphs, as of games through July 22, 2025
 
 library(plyr)
 library(dplyr)
