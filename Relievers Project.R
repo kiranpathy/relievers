@@ -38,7 +38,7 @@ model1 <- lm(ERA ~ `K%` + `Zone%` + `GB/FB` + `HardHit%`,
             data = starters)
 summary(model1)
 
-model2 <- lm(ERA ~ `K%` + `Zone%` + `GB/FB` + `HardHit%` + `O-Swing%`,
+model2 <- lm(ERA ~ `O-Swing%` + `Zone%` + `GB/FB` + `HardHit%` + `O-Swing%`,
              data = starters)
 summary(model2)
 
