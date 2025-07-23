@@ -70,9 +70,10 @@ relievers <- relievers %>%
 
 relievers_new <- relievers %>%
   mutate(`diff_ERA-` = `pred_ERA-` - `ERA-`) %>%
-  filter(`pred_ERA-` <= 90 & WHIP <= 1.30 & `GB/FB` >= 1)
+  filter(`pred_ERA-` <= 90 & WHIP <= 1.30 & `GB/FB` >= 1) %>%
+  arrange(`pred_ERA-`)
 
 #an ERA- of 90 or lower is an above average pitcher per Fangraphs
 
 write_csv(starters_new, "starters_combined.csv")
-write_csv(relievers_new, "reliever_candidates.csv")
+write_csv(relievers_new, "starter_candidates.csv")
