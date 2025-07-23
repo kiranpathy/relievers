@@ -74,4 +74,5 @@ relievers_new <- relievers %>%
 
 #an ERA- of 90 or lower is an above average pitcher per Fangraphs
 
-write_csv(starters, "starters_combined")
+write_csv(starters_new, "starters_combined.csv")
+write_csv(relievers_new, "reliever_candidates.csv")
