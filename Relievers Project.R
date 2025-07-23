@@ -25,8 +25,12 @@ library(knitr)
 library(gt)
 library(tinytex)
 
-starters <- read_csv("starters_7_22.csv")
-relievers_new <- read_csv("relievers_7_22.csv")
+starters_25 <- read_csv("starters_7_22.csv")
+starters_24 <- read_csv("starters_2024.csv")
+starters_23 <- read_csv("starters_2023.csv")
+relievers <- read_csv("relievers_7_22.csv")
+
+starters <- rbind(starters_25, starters_24, starters_23)
 
 #Getting correlations for starters
 starters$`K%` <- as.numeric(sub("%", "", starters$`K%`)) / 100
@@ -34,31 +38,35 @@ starters$`O-Swing%` <- as.numeric(sub("%", "", starters$`O-Swing%`)) / 100
 starters$`HardHit%` <- as.numeric(sub("%", "", starters$`HardHit%`)) / 100
 starters$`Zone%` <- as.numeric(sub("%", "", starters$`Zone%`)) / 100
 
-model1 <- lm(ERA ~ `K%` + `Zone%` + `GB/FB` + `HardHit%`,
+model1 <- lm(`ERA-` ~ `K%` + `Zone%` + `GB/FB` + `HardHit%`,
             data = starters)
 summary(model1)
 
-model2 <- lm(ERA ~ `O-Swing%` + `Zone%` + `GB/FB` + `HardHit%` + `O-Swing%`,
-             data = starters)
-summary(model2)
+#model2 <- lm(`ERA-` ~ `K%` + `Zone%` + `GB/FB` + `HardHit%`,
+             #data = starters, weights = `Start-IP`)
+#summary(model2)
 
-AIC(model1, model2)
+#AIC(model1, model2)
 
 #model2 is just used for adjustments - continue with model1 
 
-starters$predicted_ERA <- predict(model1, newdata = starters)
+starters <- starters %>%
+  mutate(`pred_ERA-` = predict(model1, newdata = starters))
 
-starters_new_update <- starters %>%
-  mutate(era_diff = predicted_ERA - ERA)
+starters_new <- starters %>%
+  mutate(`diff_ERA-` = `pred_ERA-` - `ERA-`)
 
-#changes for relievers_new
-relievers_new$`K%` <- as.numeric(sub("%", "", relievers_new$`K%`)) / 100
-relievers_new$`O-Swing%` <- as.numeric(sub("%", "", relievers_new$`O-Swing%`)) / 100
-relievers_new$`HardHit%` <- as.numeric(sub("%", "", relievers_new$`HardHit%`)) / 100
-relievers_new$`Zone%` <- as.numeric(sub("%", "", relievers_new$`Zone%`)) / 100
+#changes for relievers
+relievers$`K%` <- as.numeric(sub("%", "", relievers$`K%`)) / 100
+relievers$`O-Swing%` <- as.numeric(sub("%", "", relievers$`O-Swing%`)) / 100
+relievers$`HardHit%` <- as.numeric(sub("%", "", relievers$`HardHit%`)) / 100
+relievers$`Zone%` <- as.numeric(sub("%", "", relievers$`Zone%`)) / 100
 
-relievers_new$predicted_ERA <- predict(model1, newdata = relievers_new)
+relievers <- relievers %>%
+  mutate(`pred_ERA-` = predict(model1, newdata = relievers))
 
-relievers_new_update <- relievers_new %>%
-  mutate(era_diff = predicted_ERA - ERA) %>%
-  filter(era_diff <= 0 & WHIP <= 1.30 & `GB/FB` >= 1)
+relievers_new <- relievers %>%
+  mutate(`diff_ERA-` = `pred_ERA-` - `ERA-`) %>%
+  filter(`pred_ERA-` <= 90 & WHIP <= 1.30 & `GB/FB` >= 1)
+
+#an ERA- of 90 or lower is an above average pitcher per Fangraphs
