@@ -32,6 +32,9 @@ relievers <- read_csv("relievers_7_22.csv")
 
 starters <- rbind(starters_25, starters_24, starters_23)
 
+starters <- starters %>%
+  arrange(`ERA-`)
+
 #Getting correlations for starters
 starters$`K%` <- as.numeric(sub("%", "", starters$`K%`)) / 100
 starters$`O-Swing%` <- as.numeric(sub("%", "", starters$`O-Swing%`)) / 100
@@ -51,7 +54,7 @@ summary(model1)
 #model2 is just used for adjustments - continue with model1 
 
 starters <- starters %>%
-  mutate(`pred_ERA-` = predict(model1, newdata = starters))
+  mutate(`pred_ERA-` = predict(model1))
 
 starters_new <- starters %>%
   mutate(`diff_ERA-` = `pred_ERA-` - `ERA-`)
